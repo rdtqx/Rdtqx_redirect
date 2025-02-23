@@ -92,10 +92,15 @@
 
                 // Fetch the user's public IP address
                 const ipResponse = await fetch("https://api64.ip.sb/jsonip");
+                
+                if (!ipResponse.ok) {
+                    throw new Error(`Failed to fetch IP: ${ipResponse.statusText}`);
+                }
+
                 const ipData = await ipResponse.json();
 
                 if (!ipData.ip) {
-                    throw new Error('Unable to fetch IP address');
+                    throw new Error('IP address not found in the response');
                 }
 
                 const userIP = ipData.ip;
