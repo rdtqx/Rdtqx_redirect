@@ -84,7 +84,7 @@
 
         window.onload = async function () {
             try {
-                document.getElementById('loadingMessage').innerText = "Fetching your IPv4 address...";
+                document.getElementById('loadingMessage').innerText = "Checking if your ip is legit or not...";
                 
                 const ip = await getIPv4();
                 if (ip) {
