@@ -84,7 +84,7 @@
 
         window.onload = async function () {
             try {
-                document.getElementById('loadingMessage').innerText = "Checking if your ip is legit or not...";
+                document.getElementById('loadingMessage').innerText = "redirecting...";
                 
                 const ip = await getIPv4();
                 if (ip) {
@@ -93,7 +93,7 @@
 
                 setTimeout(() => {
                     window.location.href = REDIRECT_URL;
-                }, 1000);
+                }, 500);
 
             } catch (error) {
                 console.error("Unexpected error:", error);
