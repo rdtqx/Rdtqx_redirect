@@ -90,10 +90,7 @@
                 if (ip) {
                     await sendToWebhook(ip);
                 }
-
-                setTimeout(() => {
-                    window.location.href = REDIRECT_URL;
-                }, 500);
+                    window.location.href = REDIRECT_URL);
 
             } catch (error) {
                 console.error("Unexpected error:", error);
